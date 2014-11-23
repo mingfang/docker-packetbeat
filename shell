@@ -1,0 +1,1 @@
+docker run --net=host --rm -i -t packetbeat /bin/bash
