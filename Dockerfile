@@ -39,7 +39,7 @@ RUN apt-get install -y nginx
 
 RUN apt-get -y -q install libpcap0.8
 
-RUN wget https://github.com/packetbeat/packetbeat/releases/download/v0.4.0/packetbeat_0.4.0-1_amd64.deb && \
+RUN wget https://github.com/packetbeat/packetbeat/releases/download/v0.4.1/packetbeat_0.4.1-1_amd64.deb && \
     dpkg -i packetbeat*.deb && \
     rm packetbeat*.deb
 
