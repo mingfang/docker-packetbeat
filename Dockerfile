@@ -1,16 +1,18 @@
 FROM ubuntu:14.04
- 
+
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update
 RUN locale-gen en_US en_US.UTF-8
 ENV LANG en_US.UTF-8
+RUN echo "export PS1='\e[1;31m\]\u@\h:\w\\$\[\e[0m\] '" >> /root/.bashrc
 
 #Runit
-RUN apt-get install -y runit 
-CMD /usr/sbin/runsvdir-start
+RUN apt-get install -y runit
+CMD export > /etc/envvars && /usr/sbin/runsvdir-start
+RUN echo 'export > /etc/envvars' >> /root/.bashrc
 
 #Utilities
-RUN apt-get install -y vim less net-tools inetutils-ping wget curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common
+RUN apt-get install -y vim less net-tools inetutils-ping wget curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common jq
 
 #Install Oracle Java 7
 RUN echo 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main' > /etc/apt/sources.list.d/java.list && \
@@ -20,11 +22,11 @@ RUN echo 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main' > /e
     apt-get install -y oracle-java7-installer
 
 #ElasticSearch
-RUN curl https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.0.tar.gz | tar xz && \
+RUN wget -O - https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.0.tar.gz | tar xz && \
     mv elasticsearch-* elasticsearch
 
 #Packetbeat's Kibana fork
-RUN curl -L https://github.com/packetbeat/kibana/releases/download/v3.1.0-pb/kibana-3.1.0-packetbeat.tar.gz | tar zx && \
+RUN wget -O - https://github.com/packetbeat/kibana/releases/download/v3.1.2-pb/kibana-3.1.2-packetbeat.tar.gz | tar zx && \
     mv kibana* kibana
 
 #NGINX
@@ -32,6 +34,7 @@ RUN apt-get install -y nginx
 
 RUN apt-get -y -q install libpcap0.8
 
+#Packetbeat Agent
 RUN wget https://github.com/packetbeat/packetbeat/releases/download/v0.4.3/packetbeat_0.4.3-1_amd64.deb && \
     dpkg -i packetbeat*.deb && \
     rm packetbeat*.deb
@@ -44,7 +47,7 @@ RUN sed -i -e 's|elasticsearch:.*|elasticsearch: "http://"+window.location.hostn
 RUN wget https://raw.githubusercontent.com/packetbeat/packetbeat/master/packetbeat.template.json
 RUN curl -L https://github.com/packetbeat/dashboards/archive/v0.4.1.tar.gz | tar zx
 
-#Add HTTP Search Dashboardk
+#Add HTTP Search Dashboard
 ADD HTTP-Search-1418699625702.json /dashboards-0.4.1/dashboards/
 RUN mv /dashboards-0.4.1/dashboards/HTTP-Search-1418699625702.json /dashboards-0.4.1/dashboards/HTTP\ Search-1418699625702.json && \
     cd /dashboards-0.4.1/generated && \
