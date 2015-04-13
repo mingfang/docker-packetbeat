@@ -1,1 +1,1 @@
-docker run -d --net=host -t packetbeat 
+docker run -p 9090:9090 -p 9200:9200 -d packetbeat 

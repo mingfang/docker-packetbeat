@@ -32,14 +32,6 @@ RUN wget -O - https://github.com/packetbeat/kibana/releases/download/v3.1.2-pb/k
 #NGINX
 RUN apt-get install -y nginx
 
-RUN apt-get -y -q install libpcap0.8
-
-#Packetbeat Agent
-RUN wget https://github.com/packetbeat/packetbeat/releases/download/v0.4.3/packetbeat_0.4.3-1_amd64.deb && \
-    dpkg -i packetbeat*.deb && \
-    rm packetbeat*.deb
-
-ADD packetbeat.conf /etc/packetbeat/packetbeat.conf
 ADD nginx.conf /etc/nginx/nginx.conf
 RUN sed -i -e 's|elasticsearch:.*|elasticsearch: "http://"+window.location.hostname + ":" + window.location.port,|' /kibana/config.js
 
