@@ -12,17 +12,17 @@ CMD export > /etc/envvars && /usr/sbin/runsvdir-start
 RUN echo 'export > /etc/envvars' >> /root/.bashrc
 
 #Utilities
-RUN apt-get install -y vim less net-tools inetutils-ping wget curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common jq
+RUN apt-get install -y vim less net-tools inetutils-ping wget curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common jq psmisc
 
-#Install Oracle Java 7
-RUN echo 'deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main' > /etc/apt/sources.list.d/java.list && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886 && \
+#Install Oracle Java 8
+RUN add-apt-repository ppa:webupd8team/java -y && \
     apt-get update && \
-    echo oracle-java7-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
-    apt-get install -y oracle-java7-installer
+    echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
+    apt-get install -y oracle-java8-installer
+ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 #ElasticSearch
-RUN wget -O - https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.0.tar.gz | tar xz && \
+RUN wget -O - https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.4.3.tar.gz | tar xz && \
     mv elasticsearch-* elasticsearch
 
 #Packetbeat's Kibana fork
@@ -36,14 +36,14 @@ ADD nginx.conf /etc/nginx/nginx.conf
 RUN sed -i -e 's|elasticsearch:.*|elasticsearch: "http://"+window.location.hostname + ":" + window.location.port,|' /kibana/config.js
 
 #Add Dashboards    
-RUN wget https://raw.githubusercontent.com/packetbeat/packetbeat/master/packetbeat.template.json
-RUN curl -L https://github.com/packetbeat/dashboards/archive/v0.4.1.tar.gz | tar zx
+RUN wget https://raw.githubusercontent.com/packetbeat/packetbeat/v0.5.0/packetbeat.template.json
+RUN curl -L https://github.com/packetbeat/dashboards/archive/v0.5.0K3.tar.gz | tar zx
 
 #Add HTTP Search Dashboard
-ADD HTTP-Search-1418699625702.json /dashboards-0.4.1/dashboards/
-RUN mv /dashboards-0.4.1/dashboards/HTTP-Search-1418699625702.json /dashboards-0.4.1/dashboards/HTTP\ Search-1418699625702.json && \
-    cd /dashboards-0.4.1/generated && \
-    python generate.py
+#ADD HTTP-Search-1418699625702.json /dashboards-0.4.1/dashboards/
+#RUN mv /dashboards-0.4.1/dashboards/HTTP-Search-1418699625702.json /dashboards-0.4.1/dashboards/HTTP\ Search-1418699625702.json && \
+#    cd /dashboards-0.4.1/generated && \
+#    python generate.py
 
 #Add runit services
 ADD sv /etc/service 
