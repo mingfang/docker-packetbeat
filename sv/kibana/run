@@ -1,0 +1,8 @@
+#!/bin/sh
+
+sv start elasticsearch || exit 1
+
+cd /kibana/bin
+
+exec 2>&1
+exec ./kibana

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+sv start elasticsearch || exit 1
+
+cd /packetbeat
+
+exec 2>&1
+exec ./packetbeat -c ./packetbeat.yml
