@@ -35,22 +35,14 @@ RUN apt-get install -y nginx
 ADD nginx.conf /etc/nginx/nginx.conf
 #RUN sed -i -e 's|elasticsearch_url:.*|elasticsearch_url: "http://"+window.location.hostname + ":" + window.location.port,|' /kibana/config/kibana.yml
 
-#Packetbeat
+#Packetbeat Agent
+RUN apt-get -y install libpcap0.8
 RUN wget -O - https://download.elastic.co/beats/packetbeat/packetbeat-1.0.0-beta2-x86_64.tar.gz | tar zx && \
     mv packetbeat* packetbeat
-ADD packetbeat.yml /packetbeat/packetbeat.yml
 
 #Add Dashboards    
-#RUN wget https://raw.githubusercontent.com/packetbeat/packetbeat/v0.5.0/packetbeat.template.json
-#RUN curl -L https://github.com/packetbeat/dashboards/archive/v0.5.0K3.tar.gz | tar zx
 RUN wget -O - https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-1.0.0-beta2.tar.gz | tar zx && \
     mv packetbeat-dashboards* packetbeat-dashboards
-
-#Add HTTP Search Dashboard
-#ADD HTTP-Search-1418699625702.json /dashboards-0.4.1/dashboards/
-#RUN mv /dashboards-0.4.1/dashboards/HTTP-Search-1418699625702.json /dashboards-0.4.1/dashboards/HTTP\ Search-1418699625702.json && \
-#    cd /dashboards-0.4.1/generated && \
-#    python generate.py
 
 #Add runit services
 ADD sv /etc/service 
