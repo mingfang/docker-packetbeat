@@ -29,12 +29,6 @@ RUN wget -O - https://download.elasticsearch.org/elasticsearch/elasticsearch/ela
 RUN wget -O - https://download.elastic.co/kibana/kibana/kibana-4.0.2-linux-x64.tar.gz | tar zx && \
     mv kibana* kibana
 
-#NGINX
-RUN apt-get install -y nginx
-
-ADD nginx.conf /etc/nginx/nginx.conf
-#RUN sed -i -e 's|elasticsearch_url:.*|elasticsearch_url: "http://"+window.location.hostname + ":" + window.location.port,|' /kibana/config/kibana.yml
-
 #Packetbeat Agent
 RUN apt-get -y install libpcap0.8
 RUN wget -O - https://download.elastic.co/beats/packetbeat/packetbeat-1.0.0-beta2-x86_64.tar.gz | tar zx && \
