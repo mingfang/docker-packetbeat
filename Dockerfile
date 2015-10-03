@@ -22,21 +22,21 @@ RUN add-apt-repository ppa:webupd8team/java -y && \
 ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 #ElasticSearch
-RUN wget -O - https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.5.2.tar.gz | tar xz && \
+RUN wget -O - https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.7.2.tar.gz | tar xz && \
     mv elasticsearch-* elasticsearch
 
 #Kibana
-RUN wget -O - https://download.elastic.co/kibana/kibana/kibana-4.0.2-linux-x64.tar.gz | tar zx && \
+RUN wget -O - https://download.elastic.co/kibana/kibana/kibana-4.1.2-linux-x64.tar.gz | tar zx && \
     mv kibana* kibana
 
 #Packetbeat Agent
 RUN apt-get -y install libpcap0.8
-RUN wget -O - https://download.elastic.co/beats/packetbeat/packetbeat-1.0.0-beta2-x86_64.tar.gz | tar zx && \
+RUN wget -O - https://download.elastic.co/beats/packetbeat/packetbeat-1.0.0-beta3-x86_64.tar.gz | tar zx && \
     mv packetbeat* packetbeat
 
 #Add Dashboards    
-RUN wget -O - https://download.elastic.co/beats/packetbeat/packetbeat-dashboards-1.0.0-beta2.tar.gz | tar zx && \
-    mv packetbeat-dashboards* packetbeat-dashboards
+RUN wget -O - http://download.elastic.co/beats/dashboards/beats-dashboards-1.0.0-beta3.tar.gz | tar zx && \
+    mv beats-dashboards* packetbeat-dashboards
 
 #Add runit services
 ADD sv /etc/service 
