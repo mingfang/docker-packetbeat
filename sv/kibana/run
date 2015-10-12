@@ -1,6 +1,7 @@
 #!/bin/sh
 
 sv start elasticsearch || exit 1
+curl -XGET 'http://localhost:9200/_cluster/health?wait_for_status=green&timeout=30s'
 
 cd /kibana/bin
 
