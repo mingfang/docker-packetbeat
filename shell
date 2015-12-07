@@ -1,1 +1,1 @@
-docker run -v `pwd`:/docker -w /docker --net=host --rm -i -t packetbeat /bin/bash
+docker run -p 5601:5601 -v `pwd`:/docker -w /docker --rm -it packetbeat /bin/bash

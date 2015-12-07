@@ -1,6 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
-sed -i -e "s|#cluster.name:.*|cluster.name: `hostname`|" /elasticsearch/config/elasticsearch.yml
+#sv start socklog-unix || exit 1
+
+source /etc/envvars
+env
+
+if [ ${CLUSTER_NAME} ]; then
+  sed -i -e "s|# cluster.name:.*|cluster.name: ${CLUSTER_NAME}|" /elasticsearch/config/elasticsearch.yml
+fi
 
 exec 2>&1
-exec /elasticsearch/bin/elasticsearch
+chpst -u elasticsearch /elasticsearch/bin/elasticsearch

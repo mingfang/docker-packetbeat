@@ -22,20 +22,25 @@ RUN add-apt-repository ppa:webupd8team/java -y && \
 ENV JAVA_HOME /usr/lib/jvm/java-8-oracle
 
 #ElasticSearch
-RUN wget -O - https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.7.2.tar.gz | tar xz && \
+RUN wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.1.0/elasticsearch-2.1.0.tar.gz | tar xz && \
     mv elasticsearch-* elasticsearch
 
-#Kibana
-RUN wget -O - https://download.elastic.co/kibana/kibana/kibana-4.1.2-linux-x64.tar.gz | tar zx && \
-    mv kibana* kibana
+RUN useradd elasticsearch
+RUN chown -R elasticsearch /elasticsearch
 
-#Packetbeat Agent
-RUN apt-get -y install libpcap0.8
-RUN wget -O - https://download.elastic.co/beats/packetbeat/packetbeat-1.0.0-beta3-x86_64.tar.gz | tar zx && \
-    mv packetbeat* packetbeat
+COPY elasticsearch.yml /elasticsearch/config/
+
+#Kibana
+RUN wget -O - https://download.elastic.co/kibana/kibana/kibana-4.3.0-linux-x64.tar.gz | tar xz && \
+    mv kibana-* kibana
+
+#Packetbeat Agent, used only for the template
+RUN wget https://download.elastic.co/beats/packetbeat/packetbeat_1.0.0_amd64.deb && \
+    dpkg -i packetbeat*.deb && \
+    rm *.deb
 
 #Add Dashboards    
-RUN wget -O - http://download.elastic.co/beats/dashboards/beats-dashboards-1.0.0-beta3.tar.gz | tar zx && \
+RUN wget -O - http://download.elastic.co/beats/dashboards/beats-dashboards-1.0.0.tar.gz | tar zx && \
     mv beats-dashboards* packetbeat-dashboards
 
 #Add runit services
@@ -44,9 +49,8 @@ ADD sv /etc/service
 RUN runsv /etc/service/elasticsearch & \
     until curl http://localhost:9200; do echo "waiting for ElasticSearch to come online..."; sleep 3; done && \
     curl -X GET 'http://localhost:9200/_cluster/health?wait_for_status=green&timeout=10s' && \
-    curl -X PUT 'http://localhost:9200/_template/packetbeat' -d@/packetbeat/packetbeat.template.json && \
-    curl -X GET 'http://localhost:9200/_template/packetbeat?pretty' && \
-    curl -X POST 'http://localhost:9200/.kibana/index-pattern/packetbeat-*?op_type=create' -d '{"title":"packetbeat-*","timeFieldName":"timestamp","customFormats":"{}"}' && \
+    curl -XPUT 'http://localhost:9200/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json && \
+    curl -XGET 'http://localhost:9200/packetbeat-*/_search?pretty' && \
     cd packetbeat-dashboards && \
     ./load.sh && \
     curl -XGET 'http://localhost:9200/_cluster/health?wait_for_status=green&timeout=10s' && \
